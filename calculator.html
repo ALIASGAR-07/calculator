@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.0.0/math.min.js"></script>
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden; /* Prevent scrolling */
+            position: relative; /* Position relative for absolute children */
+        }
+
+        h1 {
+            color: #ff9500;
+            position: relative; /* Position relative for z-index */
+            z-index: 1; /* Ensure it appears above the video */
+        }
+
+        .calculator {
+            background: rgba(46, 46, 46, 0); /* Semi-transparent background */
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 320px;
+            border: 2px solid  rgb(255, 255, 255);
+            position: relative; /* Position relative for z-index */
+            z-index: 1; /* Ensure it appears above the video */
+        }
+
+        #result {
+            width: 100%;
+            height: 60px;
+            font-size: 32px;
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 0px;
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #333;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 24px;
+            border: none;
+            border-radius: 50px;
+            background: #e0e0e0;
+            color: #333;
+            cursor: pointer;
+            transition: 0.2s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: #ff9500;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Video styling */
+        video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 0; /* Ensure it is behind other elements */
+            transform: translate(-50%, -50%);
+            background: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <video autoplay muted loop>
+        <source src="12421542_3840_2160_30fps.mp4" type="video/mp4"> <!-- Replace with your video URL -->
+        Your browser does not support the video tag.
+    </video>
+    <h1>CALCULATOR</h1>
+    <div class="calculator" id="calculator">
+        <input type="text" id="result" placeholder="0" readonly>
+        <div class="buttons">
+            <button onclick="clearDisplay()" style="background-color: rgb(255, 77, 0); color: white;">C</button>
+            <button id="backspace" onclick="backspace()" style ="background-color: grey; color: black;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="16" stroke-dashoffset="16" d="M19 12h-13.5"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.2s" values="16;0"/></path><path stroke-dasharray="10" stroke-dashoffset="10" d="M5 12l5 5M5 12l5 -5"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.2s" dur="0.2s" values="10;0"/></path></g></svg></button>
+            <button onclick="display('/')" style="background-color: rgb(255, 162, 0); color: white;">/</button>
+            <button onclick="display('*')" style="background-color: rgb(255, 162, 0); color: white; ">*</button>
+            <button onclick="display('7')">7</button>
+            <button onclick="display('8')">8</button>
+            <button onclick="display('9')">9</button>
+            <button onclick="display('-')" style="background-color: rgb(255, 162, 0); color: white;">-</button>
+            <button onclick="display('4')">4</button>
+            <button onclick="display('5')">5</button>
+            <button onclick="display('6')">6</button>
+            <button onclick="display('+')" style="background-color: rgb(255, 162, 0); color: white;">+</button>
+            <button onclick="display('1')">1</button>
+            <button onclick="display('2')">2</button>
+            <button onclick="display('3')">3</button>
+            <button onclick="display('%')" style="background-color: rgb(255, 162, 0); color: white;">%</button>
+            <button onclick="display('0')">0</button>
+            <button onclick="display('00')">00</button>
+            <button onclick="display('.')" style="background-color: rgb(255, 162, 0); color: white;">.</button>
+            <button onclick="solve()" style="background-color: rgb(32, 145, 15);color: white;">=</button>
+        </div>
+    </div>
+
+    <script>
+        function display(val) {
+            document.getElementById('result').value += val;
+        }
+
+        function myfun(event) {
+            if (event.key.match(/[0-9+\-*/.]/)) {
+                document.getElementById('result').value += event.key;
+            }
+        }
+
+        document.addEventListener('keydown', myfun);
+
+        var cal = document.getElementById('calculator');
+        cal.onkeyup = function (event) {
+            if (event.keyCode == 13) {
+                solve();
+            }
+        }
+
+        function solve() {
+            let x = document.getElementById('result').value;
+            try {
+                let result = math.evaluate(x);
+                document.getElementById('result').value = result;
+            } catch (error) {
+                document.getElementById('result').value = "Error";
+            }
+        }
+
+        function clearDisplay() {
+            document.getElementById('result').value = "";
+        }
+
+        function backspace() {
+            let display = document.getElementById("result");
+            display.value = display.value.slice(0, -1);
+        }
+    </script>
+</body>
+
+</html>
